@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+<body>
+	<div ng-app="myApp" ng-controller="myCtrl">
+		<h1>URL Shortener</h1>
+		<p>Create your Short URL</p>
+		<p align="left">
+			Long URL : <input type="text" ng-model="longURL"> Short URL :
+			localhost:4567/ <input type="text" ng-model="shortURL">
+		</p>
+		<button ng-click="salva()">Save</button>
+		<button ng-click="gen()">Generate</button>
+		{{stringAssociation}}
+		<p>Show URL</p>
+		<p align="left">
+			Short URL : localhost:4567/ <input type="text" ng-model="shortUrl">
+			{{ris}}{{lon}}
+		</p>
+		<button ng-click="viewStats()">View stats</button>
+		<button ng-click="fun()">Show long URL</button>
+		<button ng-click="vai()">GO</button>
+		<ul>
+			<li ng-repeat="x in nome">{{ x.name+ " " + x.value }}</li>
+		</ul>
+		{{erro}} {{errore}}
+		<script>
+			var app = angular.module('myApp', []);
+			app
+					.controller(
+							'myCtrl',
+							function($scope, $http, $window) {
+
+								$scope.reset = function() {
+									$scope.longURL = "";
+									$scope.shortURL = "";
+								};
+
+								$scope.render = function() {
+									return "http://localhost:4567/getLongUrl?shortUrl="
+											+ $scope.shortUrl;
+								};
+
+								$scope.fun = function() {
+									$http
+											.get($scope.render())
+											.success(
+													function(resp) {
+														$scope.ris = "Long URL: ";
+														$scope.nam = resp.data;
+														if ($scope.nam.err == "ok") {
+															$scope.lon = $scope.nam.longUrl;
+															$scope.nome = "";
+															$scope.erro = "";
+														} else {
+															$scope.lon = $scope.nam.err;
+															$scope.nome = "";
+															$scope.ris = "";
+															$scope.erro = "";
+														}
+													}).error(function(resp) {
+												$scope.boh = "errore";
+											});
+								};
+
+								$scope.save = function() {
+									return "http://localhost:4567/addShortUrl?shortUrl="
+											+ $scope.shortURL
+											+ "&longUrl="
+											+ $scope.longURL;
+								};
+
+								$scope.salva = function() {
+									$http
+											.get($scope.save())
+											.success(
+													function(risp) {
+														$scope.res = risp.data;
+														if ($scope.res.err != "ok") {
+															$scope.ris = $scope.res.err;
+														} else {
+															$scope.stringAssociation = "Long URL '"
+																	+ $scope.longURL
+																	+ "' e Short URL 'localhost:4567/"
+																	+ $scope.shortURL
+																	+ "' associated!";
+															$scope.reset();
+														}
+													}).error(function(risp) {
+												$scope.res = "errore";
+											});
+								};
+
+								$scope.asd = function() {
+									return "http://localhost:4567/addClick?shortUrl="
+											+ $scope.shortUrl;
+								};
+
+								$scope.vai = function() {
+									var e = $scope.lon;
+									$scope.w = e;
+									$http
+											.get($scope.asd())
+											.success(
+													//se clicco su go prima che su show long url, mi apre pagina bianca
+													function(response) {
+														$scope.aggiungi = response.data;
+														if ($scope.aggiungi.err == "ok") {
+															$scope.apri = $scope.aggiungi.longUrl;
+															$window
+																	.open($scope.apri);
+														} else {
+															$scope.errore = $scope.aggiungi;
+														}
+													}).error(
+													function(response) {
+														$scope.boh = "errore";
+													});
+								};
+
+								$scope.perStats = function() {
+									return "http://localhost:4567/getStats?shortUrl="
+											+ $scope.shortUrl;
+								};
+
+								$scope.viewStats = function() {
+									$http
+											.get($scope.perStats())
+											.success(
+													function(risposta) {
+														$scope.nom = risposta.data;
+														if ($scope.nom.err == "ok") {
+															$scope.nome = $scope.nom.stats;
+															$scope.erro = "";
+															$scope.lon = "";
+															$scope.ris = "";
+														} else {
+															$scope.erro = $scope.nom.err;
+															$scope.nome = "";
+															$scope.ris = "";
+															$scope.lon = "";
+														}
+													}).error(
+													function(risposta) {
+														$scope.boh = "errore";
+													});
+								};
+
+								$scope.generate = function() {
+									return "http://localhost:4567/generateShortUrl?longUrl="
+											+ $scope.longURL;
+								};
+
+								$scope.gen = function() {
+									$http
+											.get($scope.generate())
+											.success(
+													function(risposta) {
+														$scope.ss = risposta.data;
+														if ($scope.ss.err == "ok") {
+															$scope.nuovo = $scope.ss.shortUrl;
+															$scope.shortURL = $scope.nuovo;
+														}
+													}).error(
+													function(risposta) {
+														$scope.boh = "errore";
+													});
+								};
+							});
+		</script>
+	</div>
+</body>
+</html>
